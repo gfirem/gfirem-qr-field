@@ -85,10 +85,10 @@ class GFireM_QrField_Fs {
 
 		if ( ! isset( $gfirem_qf_fs ) ) {
 			// Include Freemius SDK.
-			$t = gfirem::$classes;
-			if ( file_exists( gfirem::$classes . 'include/freemius/start.php' ) ) {
+			$classes_path = gfirem_fs::$classes;
+			if ( file_exists( $classes_path . 'include/freemius/start.php' ) ) {
 				// Try to load SDK from parent plugin folder.
-				require_once gfirem::$classes . 'include/freemius/start.php';
+				require_once $classes_path . 'include/freemius/start.php';
 				$gfirem_qf_fs = fs_dynamic_init( array(
 					'id'               => '1525',
 					'slug'             => 'qr-field',
@@ -103,10 +103,13 @@ class GFireM_QrField_Fs {
 						'public_key' => 'pk_47201a0d3289152f576cfa93e7159',
 						'name'       => 'GFireM Fields',
 					),
-					'menu'             => array(
-						'slug'       => 'qr-field',
-						'first-path' => 'admin.php?page=gfirem',
-						'support'    => false,
+					'menu'                => array(
+						'slug'           => 'qr-field',
+						'first-path'     => 'admin.php?page=gfirem',
+						'support'        => false,
+						'parent'         => array(
+							'slug' => 'gfirem',
+						),
 					),
 				) );
 			} else {
