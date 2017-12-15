@@ -32,7 +32,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-if ( class_exists( 'gfirem' ) ) {
+
 	if ( ! class_exists( 'GFireM_QrField' ) ) {
 		require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class-gfirem-qr-field-fs.php';
 		$is_fs_loaded = GFireM_QrField_Fs::get_instance();
@@ -49,6 +49,7 @@ if ( class_exists( 'gfirem' ) ) {
 				 * Initialize the plugin.
 				 */
 				private function __construct() {
+
 					require_once gfirem::$fields . DIRECTORY_SEPARATOR . 'gfirem_field_base.php';
 					require_once gfirem::$classes . DIRECTORY_SEPARATOR . 'gfirem_fs.php';
 					$this->constants();
@@ -56,6 +57,9 @@ if ( class_exists( 'gfirem' ) ) {
 					require_once GFIREM_QR_CLASSES_PATH . 'class-qr_field.php';
 					new GFireMQrFieldController();
 				}
+
+
+
 
 				private function constants() {
 					define( 'GFIREM_QR_CSS_PATH', plugin_dir_url( __FILE__ ) . 'assets/css/' );
@@ -86,11 +90,9 @@ if ( class_exists( 'gfirem' ) ) {
 				}
 			}
 
-			add_action( 'plugins_loaded', array( 'GFireM_QrField', 'get_instance' ), 1 );
+			add_action( 'plugins_loaded', array( 'GFireM_QrField', 'get_instance' ), 99999 );
 		}
 	} else {
 		//TODO necesita notificar aqui que no esta insalado el core
 	}
-} else {
-	//TODO necesita notificar aqui que no esta insalado el core
-}
+
