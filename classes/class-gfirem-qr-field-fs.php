@@ -14,110 +14,75 @@ if ( ! defined( 'WPINC' ) ) {
 
 class GFireM_QrField_Fs {
 
-	/**
-	 * Instance of this class.
-	 *
-	 * @var object
-	 */
-	protected static $instance = null;
+
+    /**
+     * Instance of this class.
+     *
+     * @var object
+     */
+    protected static $instance = null;
+    protected static $slug = 'gfirem-qr';
 
 	public function __construct() {
-		if ( $this->gfirem_qf_fs_is_parent_active_and_loaded() ) {
-			// If parent already included, init add-on.
-			return $this->gfirem_qf_fs_init();
-		} else if ( $this->gfirem_qf_fs_is_parent_active() ) {
-			// Init add-on only after the parent is loaded.
-			add_action( 'gfirem_fs_loaded', array( $this, 'gfirem_qf_fs_init' ) );
-		} else {
-			// Even though the parent is not activated, execute add-on for activation / uninstall hooks.
-			return $this->gfirem_qf_fs_init();
-		}
-
-		return false;
+        $this->freemius();
 	}
 
-	/**
-	 * Return an instance of this class.
-	 *
-	 * @return object A single instance of this class.
-	 */
-	public static function get_instance() {
-		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
-			self::$instance = new self;
-		}
+    /**
+     * @return Freemius
+     */
+    public static function getFreemius() {
+        global $gfirem;
 
-		return self::$instance;
-	}
+        return $gfirem[ self::$slug ]['freemius'];
+    }
 
-	function gfirem_qf_fs_is_parent_active_and_loaded() {
-		// Check if the parent's init SDK method exists.
-		return class_exists( 'gfirem' );
-	}
+    // Create a helper function for easy SDK access.
+    public function freemius() {
+        global $gfirem;
 
-	function gfirem_qf_fs_is_parent_active() {
-		$active_plugins_basenames = get_option( 'active_plugins' );
+        if ( ! isset( $gfirem[ self::$slug ]['freemius'] ) ) {
+            // Include Freemius SDK.
+            require_once dirname( __FILE__ ) . '/include/freemius/start.php';
 
-		foreach ( $active_plugins_basenames as $plugin_basename ) {
-			if ( 0 === strpos( $plugin_basename, 'gfirem/' ) ||
-			     0 === strpos( $plugin_basename, 'gfirem-premium/' )
-			) {
-				return true;
-			}
-		}
+            $gfirem[ self::$slug ]['freemius'] = fs_dynamic_init( array(
+                'id'               => '846',
+                'slug'             => 'gfirem-qr',
+                'type'             => 'plugin',
+                'public_key'       => 'pk_75fcfc0463639947aa91b0c11e0c0',
+                'is_premium'       => true,
+                'is_premium_only'  => true,
+                'has_addons'       => false,
+                'has_paid_plans'   => true,
+                'is_org_compliant' => false,
+                'trial'            => array(
+                    'days'               => 14,
+                    'is_require_payment' => true,
+                ),
+                'menu'             => array(
+                    'slug'       => 'gfirem-qr',
+                    'first-path' => 'admin.php?page=gfirem-qr',
+                    'support'    => false,
+                ),
+                // Set the SDK to work in a sandbox mode (for development & testing).
+                // IMPORTANT: MAKE SURE TO REMOVE SECRET KEY BEFORE DEPLOYMENT.
+                'secret_key'       => 'sk_S&oQ@<cgrATjI%~J4w8$V2C6U%4kV',
+            ) );
+        }
 
-		return false;
-	}
+        return $gfirem[ self::$slug ]['freemius'];
+    }
 
-	function gfirem_qf_fs_init() {
-		if ( $this->gfirem_qf_fs_is_parent_active_and_loaded() ) {
-			// Init Freemius.
-			$result = $this->load_freemius();
+    /**
+     * Return an instance of this class.
+     *
+     * @return GFireMAutocompleteFreemius A single instance of this class.
+     */
+    public static function get_instance() {
+        // If the single instance hasn't been set, set it now.
+        if ( null == self::$instance ) {
+            self::$instance = new self;
+        }
 
-			return $result;
-		} else {
-			return false;
-		}
-	}
-
-	private function load_freemius() {
-		global $gfirem_qf_fs;
-
-		if ( ! isset( $gfirem_qf_fs ) ) {
-			// Include Freemius SDK.
-			$classes_path = gfirem_fs::$classes;
-			if ( file_exists( $classes_path . 'include/freemius/start.php' ) ) {
-				// Try to load SDK from parent plugin folder.
-				require_once $classes_path . 'include/freemius/start.php';
-				$gfirem_qf_fs = fs_dynamic_init( array(
-					'id'               => '1525',
-					'slug'             => 'qr-field',
-					'type'             => 'plugin',
-					'public_key'       => 'pk_a5ff0f40c32174e33a129a9f65c46',
-					'is_premium'       => true,
-					'has_paid_plans'   => true,
-					'is_org_compliant' => false,
-					'parent'           => array(
-						'id'         => '848',
-						'slug'       => 'gfirem',
-						'public_key' => 'pk_47201a0d3289152f576cfa93e7159',
-						'name'       => 'GFireM Fields',
-					),
-					'menu'                => array(
-						'slug'           => 'qr-field',
-						'first-path'     => 'admin.php?page=gfirem',
-						'support'        => false,
-						'parent'         => array(
-							'slug' => 'gfirem',
-						),
-					),
-				) );
-			} else {
-				return false;
-			}
-		}
-
-		return $gfirem_qf_fs;
-	}
-
+        return self::$instance;
+    }
 }
