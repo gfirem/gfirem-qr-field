@@ -42,7 +42,7 @@ class GFireM_QrField_Fs {
 
         if ( ! isset( $gfirem[ self::$slug ]['freemius'] ) ) {
             // Include Freemius SDK.
-            require_once dirname( __FILE__ ) . '/include/freemius/start.php';
+            require_once dirname( __FILE__ ) . '/includes/freemius/start.php';
 
             $gfirem[ self::$slug ]['freemius'] = fs_dynamic_init( array(
                 'id'               => '846',
@@ -75,7 +75,7 @@ class GFireM_QrField_Fs {
     /**
      * Return an instance of this class.
      *
-     * @return GFireMAutocompleteFreemius A single instance of this class.
+     * @return GFireM_QrField_Fs A single instance of this class.
      */
     public static function get_instance() {
         // If the single instance hasn't been set, set it now.

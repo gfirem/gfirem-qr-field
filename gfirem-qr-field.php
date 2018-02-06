@@ -28,99 +28,87 @@
  * limitations under the License.
  */
 
-if (!defined('WPINC')) {
-    die;
+if ( ! defined( 'WPINC' ) ) {
+	die;
 }
 
 
-if (!class_exists('GFireM_QrField')) {
-    require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class-gfirem-qr-field-fs.php';
-    GFireM_QrField_Fs::get_instance();
+if ( ! class_exists( 'GFireM_QrField' ) ) {
 
-    class GFireM_QrField
-    {
-        /**
-         * Instance of this class.
-         *
-         * @var object
-         */
-        protected static $instance = null;
+	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class-gfirem-qr-field-fs.php';
+	GFireM_QrField_Fs::get_instance();
 
-        public static $assets;
-        public static $view;
-        public static $classes;
-        public static $slug = 'gfirem-qr';
-        public static $version = '1.0.0';
+	class GFireM_QrField {
+		/**
+		 * Instance of this class.
+		 *
+		 * @var object
+		 */
+		protected static $instance = null;
 
-        /**
-         * Initialize the plugin.
-         */
-        private function __construct()
-        {
-            $this->constants();
-            self::$assets  = plugin_dir_url( __FILE__ ) . 'assets/';
-            self::$view    = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR;
-            self::$classes = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
-            $this->load_plugin_textdomain();
-            require_once self::$classes . 'class-gfirem-qr-manager.php';
-            new GFireMQRManager();
-        }
-        static function getFreemius(){
-            return GFireM_QrField_Fs::getFreemius();
-        }
+		public static $assets;
+		public static $view;
+		public static $classes;
+		public static $slug = 'gfirem-qr';
+		public static $version = '1.0.0';
 
-        /**
-         * Get plugin version
-         *
-         * @return string
-         */
-        static function getVersion() {
-            return self::$version;
-        }
+		/**
+		 * Initialize the plugin.
+		 */
+		private function __construct() {
+			self::$assets  = plugin_dir_url( __FILE__ ) . 'assets/';
+			self::$view    = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR;
+			self::$classes = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR;
+			$this->load_plugin_textdomain();
+			require_once self::$classes . 'class-gfirem-qr-manager.php';
+			new GFireMQRManager();
+		}
 
-        /**
-         * Get plugins slug
-         *
-         * @return string
-         */
-        static function getSlug() {
-            return self::$slug;
-        }
+		static function getFreemius() {
+			return GFireM_QrField_Fs::getFreemius();
+		}
 
-        /**
-         * Return an instance of this class.
-         *
-         * @return object A single instance of this class.
-         */
-        public static function get_instance() {
-            // If the single instance hasn't been set, set it now.
-            if ( null == self::$instance ) {
-                self::$instance = new self;
-            }
+		/**
+		 * Get plugin version
+		 *
+		 * @return string
+		 */
+		static function getVersion() {
+			return self::$version;
+		}
 
-            return self::$instance;
-        }
+		/**
+		 * Get plugins slug
+		 *
+		 * @return string
+		 */
+		static function getSlug() {
+			return self::$slug;
+		}
 
-        /**
-         * Load the plugin text domain for translation.
-         */
-        public function load_plugin_textdomain() {
-            load_plugin_textdomain( 'gfirem_qr-locale', false, basename( dirname( __FILE__ ) ) . '/languages' );
-        }
+		/**
+		 * Return an instance of this class.
+		 *
+		 * @return object A single instance of this class.
+		 */
+		public static function get_instance() {
+			// If the single instance hasn't been set, set it now.
+			if ( null == self::$instance ) {
+				self::$instance = new self;
+			}
 
+			return self::$instance;
+		}
 
-        private function constants()
-        {
-            define('GFIREM_QR_CSS_PATH', plugin_dir_url(__FILE__) . 'assets/css/');
-            define('GFIREM_QR_JS_PATH', plugin_dir_url(__FILE__) . 'assets/js/');
-            define('GFIREM_QR_VIEW_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR);
-            define('GFIREM_QR_CLASSES_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR);
-        }
+		/**
+		 * Load the plugin text domain for translation.
+		 */
+		public function load_plugin_textdomain() {
+			load_plugin_textdomain( 'gfirem_qr-locale', false, basename( dirname( __FILE__ ) ) . '/languages' );
+		}
+	}
 
-    }
-
-
-    add_action('plugins_loaded', array('GFireM_QrField', 'get_instance'), 99999);
+	add_action( 'plugins_loaded', array( 'GFireM_QrField', 'get_instance' ), 99999 );
 }
 
 
