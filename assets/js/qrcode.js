@@ -30,7 +30,8 @@ jQuery(document).ready(function ($) {
                          action: 'generate_qr_code',
                          nonce: gfirem_qr.ajaxnonce,
                          message: message,
-                         key:id
+                         key:id,
+                         params : gfirem_qr
                      },
                      success: function (fields) {
                          $('#qr_loader_'+id).hide();

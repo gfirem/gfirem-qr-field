@@ -1,4 +1,4 @@
-<div class="gfirem_qr" <?php do_action( 'frm_field_input_html', $field ) ?> field_id="<?php echo esc_attr( $field_name ) ?>" id="qr_field_container_<?php echo esc_attr( $field['field_key'] ) ?>">
+<div style="width: 500px" class="gfirem_qr" <?php do_action( 'frm_field_input_html', $field ) ?> field_id="<?php echo esc_attr( $field_name ) ?>" id="qr_field_container_<?php echo esc_attr( $field['field_key'] ) ?>">
     <input data-action="store-qr" type="hidden" id="field_<?php echo esc_attr( $html_id ) ?>" name="<?php echo esc_attr( $field_name ) ?>" value="<?php echo esc_attr( $print_value ); ?>" class="file-upload-input"/>
     <div <?php echo esc_attr( $showContainer ) ?> id="qr_container_<?php echo esc_attr( $html_id ) ?>"><img id="snap_thumbnail_<?php echo esc_attr( $field_name ) ?>" alt="<?php echo esc_attr( $attachment_title ) ?>" src="<?php echo esc_attr( $imageFullUrl ) ?>"></div>
     <div align="left" id="my_qr_<?php echo esc_attr( $html_id ) ?>">
