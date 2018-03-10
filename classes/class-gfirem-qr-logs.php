@@ -10,7 +10,7 @@ class GFireMQRLogs {
 
     public function aal_init_roles( $roles ) {
         $roles_existing          = $roles['manage_options'];
-        $roles['manage_options'] = array_merge( $roles_existing, array( GFireM_QrField::getSlug() ) );
+        $roles['manage_options'] = array_merge( $roles_existing, array( GFireM_Qr::getSlug() ) );
 
         return $roles;
     }

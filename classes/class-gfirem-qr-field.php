@@ -9,28 +9,23 @@
  * @license    http://www.apache.org/licenses/
  *
  */
-class GFireMQrField extends GFireMQrFieldBase {
-
+class GFireMQrField extends GFireMFieldBase {
+	
 	public $version = '1.0.0';
-
+	
 	public function __construct() {
 		parent::__construct( 'qr_field', GFireMQRManager::translate( 'QR Field' ),
 			array(
 				'button_title' => GFireMQRManager::translate( 'Generate QR' ),
 			),
-			GFireMQRManager::translate( 'Generate QR Code.' )
-
+			GFireMQRManager::translate( 'Generate QR Code.' ),
+			array( 'icon' => 'icon qrf-qrcode' )
 		);
-
+		
 		add_action( 'frm_before_destroy_entry', array( $this, 'process_destroy_entry' ), 10, 2 );
 		add_action( 'wp_ajax_generate_qr_code', array( $this, 'generate_qr_code' ) );
-		//add_filter( 'gfirem_fields_array', array( $this, 'register_extension' ) );
 	}
-
-	public function register_extension( $extension ) {
-		return array_merge( $extension, array( 'qr_field' => GFIREM_QR_CLASSES_PATH . 'class-qr_field.php' ) );
-	}
-
+	
 	/**
 	 * Destroy the attached image to the entry
 	 *
@@ -46,14 +41,14 @@ class GFireMQrField extends GFireMQrFieldBase {
 			}
 		}
 	}
-
-
+	
+	
 	public function generate_qr_code() {
 		$message = isset( $_POST['message'] ) ? $_POST['message'] : 0;
 		$key     = isset( $_POST['key'] ) ? $_POST['key'] : 0;
 		$value   = '';
-
-		include dirname( __FILE__ ) . '/phpqrcode/qrlib.php';
+		
+		include dirname( __FILE__ ) . '/includes/phpqrcode/qrlib.php';
 		$upload_dir     = wp_upload_dir();
 		$file_id        = $this->slug . '_' . $key . '_' . time();
 		$file_name      = $file_id . ".png";
@@ -86,17 +81,19 @@ class GFireMQrField extends GFireMQrFieldBase {
 		echo "$str";
 		die();
 	}
-
+	
 	/**
 	 * Add script needed to load the field
 	 *
-	 * @param $hook
+	 * @param string $hook
+	 * @param string $image_url
+	 * @param        $field_name
 	 */
 	public function add_script( $hook = '', $image_url = '', $field_name ) {
-		wp_register_style( 'wpdocsPluginStylesheet', GFIREM_QR_CSS_PATH . 'qr.css' );
+		wp_register_style( 'wpdocsPluginStylesheet', GFireM_Qr::$assets . 'css/qr.css' );
 		wp_enqueue_style( 'wpdocsPluginStylesheet' );
-
-		wp_enqueue_script( 'gfirem_qr', GFIREM_QR_JS_PATH . 'qrcode.js', array( "jquery" ), $this->version, true );
+		
+		wp_enqueue_script( 'gfirem_qr', GFireM_Qr::$assets . 'js/qrcode.js', array( "jquery" ), $this->version, true );
 		$params          = array(
 			'ajaxurl'   => admin_url( 'admin-ajax.php' ),
 			'ajaxnonce' => wp_create_nonce( 'fac_qr_code' )
@@ -116,7 +113,7 @@ class GFireMQrField extends GFireMQrFieldBase {
 		}
 		wp_localize_script( 'gfirem_qr', 'gfirem_qr', $params );
 	}
-
+	
 	/**
 	 * Options inside the form
 	 *
@@ -125,11 +122,11 @@ class GFireMQrField extends GFireMQrFieldBase {
 	 * @param $values
 	 */
 	protected function inside_field_options( $field, $display, $values ) {
-
-		include GFIREM_QR_VIEW_PATH . 'field_option.php';
-
+		
+		include GFireM_Qr::$view . 'field_option.php';
+		
 	}
-
+	
 	protected function field_front_view( $field, $field_name, $html_id ) {
 		$field['value'] = stripslashes_deep( $field['value'] );
 		$html_id        = $field['id'];
@@ -147,34 +144,34 @@ class GFireMQrField extends GFireMQrFieldBase {
 		$attachment_title = basename( get_attached_file( $field['value'] ) );
 		$button_name      = FrmField::get_option( $field, 'button_title' );
 		$this->add_script( '', $imageUrl, $field_name );
-
-		include GFIREM_QR_VIEW_PATH . 'field_qr.php';
-
+		
+		include GFireM_Qr::$view . 'field_qr.php';
+		
 	}
-
+	
 	protected function field_admin_view( $value, $field, $attr ) {
-
+		
 		$value = $this->getMicroImage( $value );
-
-
+		
+		
 		return $value;
 	}
-
+	
 	private function getMicroImage( $id ) {
 		$result = '';
 		$src    = wp_get_attachment_url( $id );
-
+		
 		if ( ! empty( $id ) && ! empty( $src ) ) {
 			$result = wp_get_attachment_image( $id, array( 50, 50 ), true ) . " <a style='vertical-align: top;' target='_blank' href='" . $src . "'>" . GFireMQRManager::translate( "Full Image" ) . "</a>";
 		}
-
-
+		
+		
 		return $result;
 	}
-
+	
 	protected function process_short_code( $id, $tag, $attr, $field ) {
 		$replace_with = '';
-
+		
 		$internal_attr = shortcode_atts( array(
 			'output' => 'img',
 			'size'   => 'thumbnail',
@@ -188,9 +185,9 @@ class GFireMQrField extends GFireMQrFieldBase {
 			$result = "<a style='vertical-align: top;' target='_blank'  href='" . wp_get_attachment_url( $id ) . "' >" . $result . "</a>";
 		}
 		$replace_with = $result;
-
-
+		
+		
 		return $replace_with;
 	}
-
+	
 }

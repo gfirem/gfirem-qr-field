@@ -35,10 +35,10 @@ if ( ! defined( 'WPINC' ) ) {
 
 if ( ! class_exists( 'GFireM_QrField' ) ) {
 
-	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class-gfirem-qr-field-fs.php';
-	GFireM_QrField_Fs::get_instance();
+	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class-gfirem-qr-fs.php';
+	GFireM_Qr_Fs::get_instance();
 
-	class GFireM_QrField {
+	class GFireM_Qr {
 		/**
 		 * Instance of this class.
 		 *
@@ -65,7 +65,7 @@ if ( ! class_exists( 'GFireM_QrField' ) ) {
 		}
 
 		static function getFreemius() {
-			return GFireM_QrField_Fs::getFreemius();
+			return GFireM_Qr_Fs::getFreemius();
 		}
 
 		/**
@@ -108,7 +108,11 @@ if ( ! class_exists( 'GFireM_QrField' ) ) {
 		}
 	}
 
-	add_action( 'plugins_loaded', array( 'GFireM_QrField', 'get_instance' ), 99999 );
+	add_action( 'plugins_loaded', 'gfirem_qr_field_init' );
+	function gfirem_qr_field_init() {
+		global $gfirem;
+		$gfirem[ GFireM_Qr::$slug ]['instance'] = GFireM_Qr::get_instance();
+	}
 }
 
 

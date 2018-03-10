@@ -11,11 +11,8 @@ Add a QR field to Formidable Pro forms!
 
 == Description ==
 ---
-If you want to optimize your url generation or code, you can use this Qr field. You will see the new Qr in your entries list and in the  Media library.
+If you want to optimize your url generation or code, you can use this Qr field. You will see the new Qr in your entries list and in the Media library.
 ---
-
-### PREMIUM VERSION
- * Add QR field to your form. Now you can generate Qr codes from your form.
 
 == Installation ==
 Upload the entire gfirem folder to the /wp-content/plugins/ directory or install the plugin through the WordPress plugins screen directly.

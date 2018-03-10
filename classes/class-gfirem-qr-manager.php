@@ -4,60 +4,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class GFireMQRManager {
-
-	/*
-	 * Me quede por:
-	 * hay que hacer que enlazar los ficheros para que carge all en su lugar.
-	 * El plugins es de pago y no tiene contenido protejido.
-	 * El campo tiene que tener el mismo slug para que siga funcionando.
-	 * Hay que hacer que el plugin sea como cascaron para todos los campos.
-	 * Hay campos que son free que van a ir directo a wp.org
-	 * Hacer el campo lo mas ligero posible
-	 * Ver si se puede implementar cache.
-	 *
-	 */
+	
 	public function __construct() {
-
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'fs_is_submenu_visible_gfirem-qr', array( $this, 'handle_sub_menu' ), 10, 2 );
-
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_style' ) );
+		
 		require_once 'class-gfirem-qr-logs.php';
 		new GFireMQRLogs();
-
+		
 		try {
 			//Check formidable pro
-			if ( self::is_formidable_active() ) {
-				if ( GFireM_QrField::getFreemius()->is_paying() ) {
-
-					require_once 'class-gfirem-qr-fieldbase.php';
-					require_once 'class-qr_field.php';
+			if ( class_exists( 'FrmAppHelper' ) && method_exists( 'FrmAppHelper', 'pro_is_installed' ) && FrmAppHelper::pro_is_installed() ) {
+				if ( GFireM_Qr::getFreemius()->is_paying() ) {
+					require_once 'class-gfirem-fieldbase.php';
+					require_once 'class-gfirem-qr-field.php';
 					new GFireMQrField();
 				}
+			} else {
+				add_action( 'admin_notices', array( $this, 'required_formidable_pro' ) );
 			}
-		} catch ( Exception $ex ) {
+		}
+		catch ( Exception $ex ) {
 			GFireMQRLogs::log( array(
-				'action'         => get_class( $this ),
-				'object_type'    => GFireM_QrField::getSlug(),
-				'object_subtype' => 'loading_dependency',
+				'action'         => 'loading_dependency',
+				'object_type'    => GFireM_Qr::getSlug(),
+				'object_subtype' => get_class( $this ),
 				'object_name'    => $ex->getMessage(),
 			) );
 		}
 	}
-
+	
+	public function admin_enqueue_style() {
+		$current_screen = get_current_screen();
+		if ( 'toplevel_page_formidable' === $current_screen->id ) {
+			wp_enqueue_style( 'formidable_key_field', GFireM_Qr::$assets . 'css/admin_qr.css' );
+		}
+	}
+	
+	public function required_formidable_pro() {
+		require GFireM_Qr::$view . 'formidable_notice.php';
+	}
+	
 	public static function translate( $str ) {
 		return __( $str, 'gfirem_qr-locale' );
 	}
-
-	public static function load_plugins_dependency() {
-		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-	}
-
-	public static function is_formidable_active() {
-		self::load_plugins_dependency();
-
-		return is_plugin_active( 'formidable/formidable.php' );
-	}
-
+	
 	/**
 	 * Handle freemius menus visibility
 	 *
@@ -70,23 +62,23 @@ class GFireMQRManager {
 		if ( $menu_id == 'account' ) {
 			$is_visible = false;
 		}
-
+		
 		return $is_visible;
 	}
-
+	
 	/**
 	 * Adding the Admin Page
 	 */
 	public function admin_menu() {
-		add_menu_page( __( "QrField", "gfirem_qr-locale" ), __( "QrField", "gfirem_qr-locale" ), 'manage_options', GFireM_QrField::getSlug(), array( $this, 'screen' ), 'dashicons-screenoptions' );
+		add_menu_page( __( "QrField", "gfirem_qr-locale" ), __( "QrField", "gfirem_qr-locale" ), 'manage_options', GFireM_Qr::getSlug(), array( $this, 'screen' ), 'dashicons-screenoptions' );
 	}
-
+	
 	/**
 	 * Screen to admin page
 	 */
 	public function screen() {
-		GFireM_QrField::getFreemius()->get_logger()->entrance();
-		GFireM_QrField::getFreemius()->_account_page_load();
-		GFireM_QrField::getFreemius()->_account_page_render();
+		GFireM_Qr::getFreemius()->get_logger()->entrance();
+		GFireM_Qr::getFreemius()->_account_page_load();
+		GFireM_Qr::getFreemius()->_account_page_render();
 	}
 }
