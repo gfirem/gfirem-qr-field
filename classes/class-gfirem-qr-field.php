@@ -9,26 +9,27 @@
  * @license    http://www.apache.org/licenses/
  *
  */
-class GFireMQrField extends GFireMQrFieldBase {
-
+class GFireMQrField extends GFireMFieldBase {
+	
 	public $version = '1.0.0';
 	private static $params = array();
-
+	
 	public function __construct() {
 		parent::__construct( 'qr_field', GFireMQRManager::translate( 'QR Field' ),
 			array(
 				'button_title' => GFireMQRManager::translate( 'Generate QR' ),
-                'size'         => 1,
-                'ECC'          => "QR_ECLEVEL_L"
+				'size'         => 1,
+				'ECC'          => "QR_ECLEVEL_L"
 			),
 			GFireMQRManager::translate( 'Generate QR Code.' ),
 			array( 'icon' => 'icon qrf-qrcode' )
 		);
-
+		
 		add_action( 'frm_before_destroy_entry', array( $this, 'process_destroy_entry' ), 10, 2 );
 		add_action( 'wp_ajax_generate_qr_code', array( $this, 'generate_qr_code' ) );
+		add_action( 'wp_ajax_nopriv_generate_qr_code', array( $this, 'generate_qr_code' ) );
 	}
-
+	
 	/**
 	 * Destroy the attached image to the entry
 	 *
@@ -44,18 +45,17 @@ class GFireMQrField extends GFireMQrFieldBase {
 			}
 		}
 	}
-
-
+	
 	public function generate_qr_code() {
-		$message = isset( $_POST['message'] ) ? $_POST['message'] : 0;
-		$key     = isset( $_POST['key'] ) ? $_POST['key'] : 0;
-		$value   = '';
+		$message   = isset( $_POST['message'] ) ? $_POST['message'] : 0;
+		$key       = isset( $_POST['key'] ) ? $_POST['key'] : 0;
+		$value     = '';
 		$gfirem_qr = isset( $_POST['params'] ) ? $_POST['params'] : 0;
-		if($gfirem_qr ==0){
-		    die();
-        }
-        $zoom_factor = $gfirem_qr['config']['field_'.$key]['size'];
-		$ECC         = $gfirem_qr['config']['field_'.$key]['ECC'];
+		if ( $gfirem_qr == 0 ) {
+			die();
+		}
+		$zoom_factor = $gfirem_qr['config'][ 'field_' . $key ]['size'];
+		$ECC         = $gfirem_qr['config'][ 'field_' . $key ]['ECC'];
 		include dirname( __FILE__ ) . '/includes/phpqrcode/qrlib.php';
 		$upload_dir     = wp_upload_dir();
 		$file_id        = $this->slug . '_' . $key . '_' . time();
@@ -85,11 +85,10 @@ class GFireMQrField extends GFireMQrFieldBase {
 		$imageUrl       = wp_get_attachment_image_url( $value );
 		$full_image_url = wp_get_attachment_image_src( $value, 'full' );
 		$imageFullUrl   = wp_get_attachment_url( $value );
-		$str            = json_encode( array( 'image_url' => $imageUrl, 'id' => $value ) );
-		echo "$str";
+		wp_send_json( array( 'image_url' => $imageUrl, 'id' => $value ) );
 		die();
 	}
-
+	
 	/**
 	 * Add script needed to load the field
 	 *
@@ -98,12 +97,12 @@ class GFireMQrField extends GFireMQrFieldBase {
 	public function add_script( $hook = '', $image_url = '', $field_name ) {
 		wp_register_style( 'wpdocsPluginStylesheet', GFireM_Qr::$assets . 'css/qr.css' );
 		wp_enqueue_style( 'wpdocsPluginStylesheet' );
-
+		
 		wp_enqueue_script( 'gfirem_qr', GFireM_Qr::$assets . 'js/qrcode.js', array( "jquery" ), $this->version, true );
-        $params  = array(
-            'ajaxurl'   => admin_url( 'admin-ajax.php' ),
-            'ajaxnonce' => wp_create_nonce( 'fac_qr_code' )
-        );
+		$params          = array(
+			'ajaxurl'   => admin_url( 'admin-ajax.php' ),
+			'ajaxnonce' => wp_create_nonce( 'fac_qr_code' )
+		);
 		$signatureFields = FrmField::get_all_types_in_form( $this->form_id, $this->slug );
 		foreach ( $signatureFields as $key => $field ) {
 			foreach ( $this->defaults as $def_key => $def_val ) {
@@ -119,7 +118,7 @@ class GFireMQrField extends GFireMQrFieldBase {
 		}
 		wp_localize_script( 'gfirem_qr', 'gfirem_qr', $params );
 	}
-
+	
 	/**
 	 * Options inside the form
 	 *
@@ -130,7 +129,7 @@ class GFireMQrField extends GFireMQrFieldBase {
 	protected function inside_field_options( $field, $display, $values ) {
 		include GFireM_Qr::$view . 'field_option.php';
 	}
-
+	
 	protected function field_front_view( $field, $field_name, $html_id ) {
 		$field['value'] = stripslashes_deep( $field['value'] );
 		$html_id        = $field['id'];
@@ -150,30 +149,30 @@ class GFireMQrField extends GFireMQrFieldBase {
 		$this->add_script( '', $imageUrl, $field_name );
 		include GFireM_Qr::$view . 'field_qr.php';
 	}
-
+	
 	protected function field_admin_view( $value, $field, $attr ) {
-
+		
 		$value = $this->getMicroImage( $value );
-
-
+		
+		
 		return $value;
 	}
-
+	
 	private function getMicroImage( $id ) {
 		$result = '';
 		$src    = wp_get_attachment_url( $id );
-
+		
 		if ( ! empty( $id ) && ! empty( $src ) ) {
 			$result = wp_get_attachment_image( $id, array( 50, 50 ), true ) . " <a style='vertical-align: top;' target='_blank' href='" . $src . "'>" . GFireMQRManager::translate( "Full Image" ) . "</a>";
 		}
-
-
+		
+		
 		return $result;
 	}
-
+	
 	protected function process_short_code( $id, $tag, $attr, $field ) {
 		$replace_with = '';
-
+		
 		$internal_attr = shortcode_atts( array(
 			'output' => 'img',
 			'size'   => 'thumbnail',
@@ -187,9 +186,9 @@ class GFireMQrField extends GFireMQrFieldBase {
 			$result = "<a style='vertical-align: top;' target='_blank'  href='" . wp_get_attachment_url( $id ) . "' >" . $result . "</a>";
 		}
 		$replace_with = $result;
-
-
+		
+		
 		return $replace_with;
 	}
-
+	
 }
