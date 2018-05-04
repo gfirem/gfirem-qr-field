@@ -40,11 +40,11 @@ jQuery(document).ready(function ($) {
                              console.log("Error");
                          }
                          else{
-                             var obj = jQuery.parseJSON( fields );
-                             if(obj.image_url!= undefined &&obj.image_url!= '' ){
+                             //var obj = jQuery.parseJSON( fields );
+                             if(fields.image_url!= undefined &&fields.image_url!= '' ){
                                  $('#qr_code_result_'+id).show();
-                                 $('#field_' + id).val(obj.id);
-                                 $('#qr_code_result_'+id).attr('src',obj.image_url);
+                                 $('#field_' + id).val(fields.id);
+                                 $('#qr_code_result_'+id).attr('src',fields.image_url);
                              }
                          }
                      }
